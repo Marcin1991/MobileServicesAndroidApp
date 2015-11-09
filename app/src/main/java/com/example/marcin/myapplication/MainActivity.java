@@ -3,6 +3,7 @@ package com.example.marcin.myapplication;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class MainActivity extends Activity {
 
-    private final Model model = new Model(this);
+    private Model model;
 
     final Context context = this;
 
@@ -36,6 +37,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        model = new Model(this);
+
+        Intent i = getIntent();
+        model.signin(
+                i.getStringExtra("login"),
+                i.getStringExtra("password")
+        );
 
         lstProducts = (ListView) findViewById(R.id.listView);
         lstProducts.setOnItemClickListener(new AdapterView.OnItemClickListener() {

@@ -24,14 +24,16 @@ import cz.msebera.android.httpclient.Header;
 public class DataProvider {
 
     private final Context context;
+    private final MyRestClient restClient;
 
     public DataProvider(Context context) {
+        this.restClient = new MyRestClient(context);
         this.context = context;
     }
 
     public void initProducts(final InitProductsCallback renderProductsList) {
 
-        MyRestClient.get("", null, new JsonHttpResponseHandler() {
+        restClient.get("", null, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -59,8 +61,18 @@ public class DataProvider {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 Toast.makeText(context, "Check your internet connection.", Toast.LENGTH_LONG).show();
+                System.out.println("products get:  " + throwable.toString() + " "+ throwable);
             }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                System.out.println("products get:  "+ throwable);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                System.out.println(throwable);
+            }
         });
     }
 
@@ -69,7 +81,7 @@ public class DataProvider {
         RequestParams params = new RequestParams("name", productName);
         params.setUseJsonStreamer(true);
 
-        MyRestClient.post("", params, new JsonHttpResponseHandler() {
+        restClient.post("", params, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -96,7 +108,7 @@ public class DataProvider {
 
     public void deleteProduct(final Product p, final ProductCallback deleteProductCallback) {
 
-        MyRestClient.delete(p.getId(), new AsyncHttpResponseHandler() {
+        restClient.delete(p.getId(), new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -119,7 +131,7 @@ public class DataProvider {
         RequestParams params = new RequestParams("amount", p.getAmount());
         params.setUseJsonStreamer(true);
 
-        MyRestClient.put(p.getId(), params, new AsyncHttpResponseHandler() {
+        restClient.put(p.getId(), params, new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -131,6 +143,28 @@ public class DataProvider {
                 if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
                     Toast.makeText(context, "Produkt nie istnieje.", Toast.LENGTH_LONG).show();
                 }
+            }
+
+        });
+    }
+
+    public void signin(String login, String password) {
+        RequestParams params = new RequestParams("username", login);
+        params.add("password", password);
+        params.setUseJsonStreamer(true);
+
+        restClient.post("login", params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    System.out.println(response.getString("message"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(restClient.getCookies());
+
             }
 
         });

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/marcin/.gradle/caches/modules-2/files-2.1/cz.msebera.android/httpclient/4.3.6/526a9f794eab830eae4f23a62c572878b3f491ab/httpclient-4.3.6.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="526a9f794eab830eae4f23a62c572878b3f491ab">
+        <dex dex="/home/marcin/AndroidStudioProjects/MyApplication/app/build/intermediates/pre-dexed/debug/httpclient-4.3.6-06f57c20e0ed5d38f056c7e4971fdf550cbea986.jar" />
+    </item>
+    <item
+        jar="/home/marcin/.gradle/caches/modules-2/files-2.1/com.loopj.android/android-async-http/1.4.9/386a4339ffe52d5d63e80f9bed8d2b1d1a418249/android-async-http-1.4.9.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="386a4339ffe52d5d63e80f9bed8d2b1d1a418249">
+        <dex dex="/home/marcin/AndroidStudioProjects/MyApplication/app/build/intermediates/pre-dexed/debug/android-async-http-1.4.9-ebbfeb33f6377a6ab7d844ee3af084f62f6d7edf.jar" />
+    </item>
+
+</items>

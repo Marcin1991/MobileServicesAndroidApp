@@ -11,6 +11,8 @@ import java.util.List;
 public class Model {
 
     private final DataProvider dataProvider;
+    private String login = "";
+    private boolean isAuthenticated = false;
 
     private final List<Product> products;
 
@@ -58,5 +60,9 @@ public class Model {
                 p.setAmount(updatedProduct.getAmount());
             }
         }
+    }
+
+    public void signin(String login, String password) {
+        dataProvider.signin(login, password);
     }
 }
