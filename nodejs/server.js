@@ -95,9 +95,7 @@ app.post('/products', isAuthenticated, function (req, res) {
   		res.send(409);
   	} else {
   		var newProduct = new Product(req.body.name);
-  		products.push(
-  			newProduct
-  		)
+  		products.push( newProduct );
   		res.status(201);
   		res.json(newProduct);
 	}
@@ -129,6 +127,48 @@ app.delete('/products/:id', isAuthenticated, function (req, res) {
 	res.send(204);
 });
 
+//synchronization
+app.post('/products/synchronize', function (req, res) {
+
+	console.log(req.body.created);
+	console.log(req.body.deleted);
+	console.log(req.body.changed);
+
+	// tworzenie nowych produktów
+	JSON.parse(req.body.created).forEach(function(entry) {
+		if(!alreadyExist(entry.name)) {
+
+			var amount = 0;
+			if(entry.delta > 0 ) {
+				amount = entry.delta;
+			}
+
+			products.push( 
+				new Product(entry.name, amount) 
+			);
+		};
+	});
+	
+	// // //usunięcie produktów
+	JSON.parse(req.body.deleted).forEach(function(entry) {
+		remove(entry.id);
+	});
+
+	// //synchronizacja ilości produktów
+	JSON.parse(req.body.changed).forEach(function(entry) {
+		var toUpdate = findById(entry.id);
+		if(toUpdate != undefined) {
+			toUpdate.amount = toUpdate.amount + entry.delta;
+			if(toUpdate.amount < 0) {
+				toUpdate.amount = 0;
+			}
+		}
+	});
+
+	res.status(200);
+    res.json(products);
+});
+
 /* Bussiness logic */
 
 function SampleProduct(id, name, amount) {
@@ -145,6 +185,16 @@ function Product(name) {
 	}
   	this.name = name;
   	this.amount = 0;
+}
+
+function Product(name, amount) {
+	if(products == undefined || products.length == 0) {
+		this.id = 0;
+	} else {
+  		this.id = products[products.length-1].id+1;
+	}
+  	this.name = name;
+  	this.amount = amount;
 }
 
 var products = [
