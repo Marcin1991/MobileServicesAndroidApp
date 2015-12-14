@@ -18,7 +18,8 @@
         android:id="@+id/listView"
         android:layout_below="@+id/textView"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="57dp" />
+        android:layout_marginTop="57dp"
+        android:layout_above="@+id/btnSynchronize" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -36,7 +37,22 @@
         android:id="@+id/btnNewProduct"
         android:layout_alignParentEnd="true"
         android:layout_alignBottom="@+id/newProductName"
-        android:layout_alignTop="@+id/newProductName" />
+        android:layout_alignTop="@+id/newProductName"
+        android:textColor="#ffffff"
+        android:background="#33bd00" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Synchronizuj urządzenia"
+        android:id="@+id/btnSynchronize"
+
+        android:textColor="#ffffff"
+        android:background="#33bd00"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/listView" />
+
 
 </RelativeLayout>
 <!-- From: file:/home/marcin/AndroidStudioProjects/MyApplication/app/src/main/res/layout/activity_main.xml -->

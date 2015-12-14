@@ -6,14 +6,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.marcin.myapplication.LoginActivity"
-    android:background="#0c92f3">
+    android:background="#ffffff">
 
             <EditText android:id="@+id/login" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:hint="@string/prompt_email"
                 android:inputType="textEmailAddress" android:maxLines="1"
                 android:singleLine="true"
-                android:textColor="#ffffff"
-                android:textColorHint="#f8f8f8" />
+                android:textColor="#7a7a7a"
+                android:textColorHint="#d7d4d4" />
 
             <EditText android:id="@+id/password" android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:hint="@string/prompt_password"
@@ -21,14 +21,15 @@
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified" android:inputType="textPassword"
                 android:maxLines="1" android:singleLine="true"
-                android:textColor="#ffffff"
-                android:textColorHint="#f8f8f8" />
+                android:textColor="#c7c7c7"
+                android:textColorHint="#e4e2e2"
+                android:selectAllOnFocus="true" />
 
             <Button android:id="@+id/email_sign_in_button" style="?android:textAppearanceSmall"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="@string/action_sign_in"
                 android:textStyle="bold"
-                android:background="#2397eb"
+                android:background="#33bd00"
                 android:shadowColor="#ffffff"
                 android:singleLine="false"
                 android:textColor="#ffffff" />

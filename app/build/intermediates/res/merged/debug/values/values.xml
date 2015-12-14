@@ -140,12 +140,12 @@
     <!-- From: file:/home/marcin/AndroidStudioProjects/MyApplication/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_sign_in">Zaloguj się</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="app_name">My Application</string>
+    <string name="action_sign_in_short">Zaloguj się</string>
+    <string name="app_name">Domowy magazynek</string>
     <string name="create_product">Nowy produkt</string>
     <string name="prompt_email">Login</string>
     <string name="prompt_password">Hasło</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">StoryRoom</string>
     <!-- From: file:/home/marcin/AndroidStudioProjects/MyApplication/app/src/main/res/values/styles.xml -->
     <eat-comment/>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">

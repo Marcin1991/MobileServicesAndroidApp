@@ -4,6 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.example.marcin.myapplication.MyRestClient;
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -31,14 +32,12 @@ public class DataProvider {
         this.context = context;
     }
 
-    public void initProducts(final InitProductsCallback renderProductsList) {
+    public void initProducts(
+            final ProductsCallback renderProductsList,
+            final Callback gettingProducts
+    ) {
 
         restClient.get("", null, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                System.out.println(statusCode + " " + response.toString());
-            }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
@@ -60,23 +59,56 @@ public class DataProvider {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                Toast.makeText(context, "Check your internet connection.", Toast.LENGTH_LONG).show();
-                System.out.println("products get:  " + throwable.toString() + " "+ throwable);
+                Toast.makeText(context, "Dane przywrócone lokalnie.", Toast.LENGTH_LONG).show();
+                gettingProducts.apply();
+                System.out.println("Products failure get:  " + throwable.toString() + " " + throwable);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                System.out.println("products get:  "+ throwable);
+                System.out.println("Poducts failure get:  " + responseString + " " + throwable);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                System.out.println(throwable);
+                System.out.println("Poducts failure get:  " + errorResponse.toString() + " " + throwable);
             }
         });
     }
 
-    public void createProduct(String productName, final CreateProductCallback createProduct) {
+    public void deleteProduct(
+            final Product p,
+            final ProductCallback deleteProductCallback,
+            final Callback failureDelete
+    ) {
+
+        restClient.delete(p.getId(), new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                deleteProductCallback.apply(p);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+                if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
+                    Toast.makeText(context, "Produkt nie istnieje.", Toast.LENGTH_LONG).show();
+                } else {
+                    failureDelete.apply();
+                }
+            }
+
+
+        });
+
+    }
+
+    public void createProduct(
+            final String productName,
+            final ProductCallback createProduct,
+            final ProductCallback cannotCreate
+    ) {
 
         RequestParams params = new RequestParams("name", productName);
         params.setUseJsonStreamer(true);
@@ -94,7 +126,7 @@ public class DataProvider {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                Toast.makeText(context, "Sprawdź połączenie z Internetem..", Toast.LENGTH_LONG).show();
+                cannotCreate.apply(new Product(productName));
             }
 
             @Override
@@ -106,27 +138,11 @@ public class DataProvider {
         });
     }
 
-    public void deleteProduct(final Product p, final ProductCallback deleteProductCallback) {
-
-        restClient.delete(p.getId(), new AsyncHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                deleteProductCallback.apply(p);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                    Toast.makeText(context, "Produkt nie istnieje.", Toast.LENGTH_LONG).show();
-                }
-            }
-
-        });
-
-    }
-
-    public void update(final Product p, final ProductCallback productCallback) {
+    public void update(
+            final Product p,
+            final ProductCallback productCallback,
+            final ProductCallback cannotUpdate
+    ) {
 
         RequestParams params = new RequestParams("amount", p.getAmount());
         params.setUseJsonStreamer(true);
@@ -142,6 +158,8 @@ public class DataProvider {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 if (statusCode == HttpURLConnection.HTTP_NOT_FOUND) {
                     Toast.makeText(context, "Produkt nie istnieje.", Toast.LENGTH_LONG).show();
+                } else {
+                    cannotUpdate.apply(p);
                 }
             }
 
@@ -168,5 +186,58 @@ public class DataProvider {
             }
 
         });
+    }
+
+    public void synchronizeDevice(
+            List<Product> changedProducts,
+            List<Product> createdProducts,
+            List<Product> deletedProducts,
+            final ProductsCallback afterSynchronization
+    ) {
+
+        System.out.println("Utworzone: " + createdProducts);
+        System.out.println("Skasowane: " + deletedProducts);
+        System.out.println("Produkty: " + changedProducts);
+
+        RequestParams params = new RequestParams("created", new Gson().toJson(createdProducts));
+        params.put("deleted", new Gson().toJson(deletedProducts));
+        params.put("changed", new Gson().toJson(changedProducts));
+        //params.setUseJsonStreamer(true);
+
+        restClient.post("synchronize", params, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+
+                List<Product> productsToShow = new ArrayList<Product>();
+
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        productsToShow.add(
+                                Product.fromJsonToJava(response.getJSONObject(i))
+                        );
+                    } catch (JSONException e) {
+                        System.out.println(e.getMessage().toString());
+                    }
+                }
+
+                afterSynchronization.apply(productsToShow);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
+                Toast.makeText(context, "Synchronizacja nie powiodła się", Toast.LENGTH_LONG).show();
+                System.out.println(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String response, Throwable throwable) {
+                Toast.makeText(context, "Synchronizacja nie powiodła się", Toast.LENGTH_LONG).show();
+                System.out.println(response);
+            }
+
+        });
+
+
     }
 }
