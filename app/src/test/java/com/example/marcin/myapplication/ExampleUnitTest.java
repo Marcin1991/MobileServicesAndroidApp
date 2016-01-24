@@ -1,4 +1,4 @@
-package com.example.marcin.myapplication;
+package com.example.marcin.storyroom;
 
 import org.junit.Test;
 

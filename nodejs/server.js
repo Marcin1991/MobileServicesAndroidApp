@@ -89,12 +89,26 @@ app.get('/products', isAuthenticated, function (req, res) {
 
 //create product
 app.post('/products', isAuthenticated, function (req, res) {
+
 	if(req.body.name == undefined || req.body.name == "") {
   		res.send(406);
   	} else if(alreadyExist(req.body.name)) {
   		res.send(409);
   	} else {
-  		var newProduct = new Product(req.body.name);
+
+  		var lon = req.body.lon;
+  		var lat = req.body.lat;
+
+		if(lon && lat) {
+
+			lon = lon.replace("[", "").replace("]", ""); 
+			lat = lat.replace("[", "").replace("]", ""); 
+
+			var newProduct = new Product(req.body.name, 0, lon, lat);
+		} else {
+			var newProduct = new ProductWithoutCoordinates(req.body.name);
+		}
+
   		products.push( newProduct );
   		res.status(201);
   		res.json(newProduct);
@@ -143,8 +157,17 @@ app.post('/products/synchronize', function (req, res) {
 				amount = entry.delta;
 			}
 
+			var lon = 0.0;
+			var lat = 0.0;
+			if(entry.lon) {
+				lon = entry.lon;
+			}
+			if(entry.lat) {
+				lat = entry.lat;
+			}
+
 			products.push( 
-				new Product(entry.name, amount) 
+				new Product(entry.name, amount, lon, lat) 
 			);
 		};
 	});
@@ -171,13 +194,15 @@ app.post('/products/synchronize', function (req, res) {
 
 /* Bussiness logic */
 
-function SampleProduct(id, name, amount) {
+function SampleProduct(id, name, amount, lon, lat) {
   	this.id = id;
   	this.name = name;
   	this.amount = amount;
+  	this.lon = lon;
+  	this.lat = lat;
 }
 
-function Product(name) {
+function ProductWithoutCoordinates(name) {
 	if(products == undefined || products.length == 0) {
 		this.id = 0;
 	} else {
@@ -185,9 +210,23 @@ function Product(name) {
 	}
   	this.name = name;
   	this.amount = 0;
+  	this.lon = 0.0;
+  	this.lat = 0.0;
 }
 
-function Product(name, amount) {
+// function Product(name, lon, lat) {
+// 	if(products == undefined || products.length == 0) {
+// 		this.id = 0;
+// 	} else {
+//   		this.id = products[products.length-1].id+1;
+// 	}
+//   	this.name = name;
+//   	this.amount = 0;
+//   	this.lon = lon;
+//   	this.lat = lat;
+// }
+
+function Product(name, amount, lon, lat) {
 	if(products == undefined || products.length == 0) {
 		this.id = 0;
 	} else {
@@ -195,13 +234,17 @@ function Product(name, amount) {
 	}
   	this.name = name;
   	this.amount = amount;
+  	this.lon = lon;
+  	this.lat = lat;
 }
 
 var products = [
-	new SampleProduct(1, "Kapusta", 12), 
-	new SampleProduct(2, "Kiełbasa", 18), 
-	new SampleProduct(3, "Ananas", 6)
+	new SampleProduct(1, "Kapusta", 12, 54.32970854, 18.61510361), 
+	new SampleProduct(2, "Kiełbasa", 18, 54.32970825, 18.61510360), 
+	new SampleProduct(3, "Ananas", 6, 54.32920855, 18.61110301)
 	]
+
+var GUIDs = []
 
 function alreadyExist(name){
 	var exist = false;

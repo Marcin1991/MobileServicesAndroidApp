@@ -29,4 +29,24 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/btnSave" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="0.00000"
+        android:id="@+id/textLon"
+        android:layout_marginBottom="48dp"
+        android:layout_above="@+id/npAmount"
+        android:layout_toEndOf="@+id/btnSave" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="0.00000"
+        android:id="@+id/textLat"
+        android:layout_alignBaseline="@+id/textLon"
+        android:layout_alignBottom="@+id/textLon"
+        android:layout_toStartOf="@+id/npAmount" />
+
 </RelativeLayout>
